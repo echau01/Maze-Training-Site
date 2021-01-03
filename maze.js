@@ -476,6 +476,8 @@ class MazePath {
      * 
      * If the conditions are not all satisfied, then the function does not change the path.
      * 
+     * If the maze path changes, all cells affected are re-rendered.
+     * 
      * @param {Cell} cell the cell to add to this maze path
      */
     add(cell) {
@@ -500,7 +502,7 @@ class MazePath {
                         drawer.drawCell(lastCell.getRow(), lastCell.getColumn(), this);
                         drawer.drawCell(cell.getRow(), cell.getColumn(), this);
 
-                        return;
+                        break;
                     }
                 }
             }
@@ -509,15 +511,15 @@ class MazePath {
 
     /**
      * Removes the given cell and all cells that come after it from this maze path.
-     * Returns the original position of the given cell on the path (where position n
-     * means the cell was the (n+1)'th cell on the path).
+     * If the cell is not on the path, does nothing.
      * 
-     * If the cell is not on the path, returns -1 and does nothing else.
+     * The cell coming before the given cell in this maze path is re-rendered.
      * 
      * @param {Cell} cell the cell to remove from this maze path
      */
     remove(cell) {
         if (cell && cell.maze === this.maze) {
+            const drawer = this.maze.getMazeDrawer();
             const position = this.cellPositions[cell.getRow()][cell.getColumn()];
 
             if (position !== -1) {
@@ -528,15 +530,15 @@ class MazePath {
                     // We omit the maze path from the function arguments because we are
                     // removing currentCell from the path, so we do not want currentCell
                     // to be rendered with a path.
-                    this.maze.getMazeDrawer().drawCell(currentCell.getRow(), currentCell.getColumn(), this);
+                    drawer.drawCell(currentCell.getRow(), currentCell.getColumn(), this);
                 }
 
                 this.path.length = position;
-                return position;
+
+                const lastCell = this.path[this.path.length - 1];
+                drawer.drawCell(lastCell.getRow(), lastCell.getColumn(), this);
             }
         }
-
-        return -1;
     }
 
     /**
@@ -572,6 +574,15 @@ class MazePath {
      */
     getLength() {
         return this.path.length;
+    }
+
+    /**
+     * Returns true if the given cell is in this maze path; false otherwise.
+     * 
+     * @param {Cell} cell the cell to check
+     */
+    isInPath(cell) {
+        return this.getPosition(cell) !== -1;
     }
 
     /**
@@ -784,26 +795,28 @@ var maze = {
             const cellRow = Math.floor(canvasY / cellHeight);
             const cellColumn = Math.floor(canvasX / cellWidth);
 
-            const cell = this._maze.getCell(cellRow, cellColumn);
+            const cellToAdd = this._maze.getCell(cellRow, cellColumn);
 
-            if (cell && cell.isOpen()) {
-                const cellNeighbours = cell.getNeighbours();
-                const lastCellInPath = this.mazePath.getCell(this.mazePath.getLength() - 1);
+            if (cellToAdd && cellToAdd.isOpen()) {
+                if (this.mazePath.isInPath(cellToAdd)) {
+                    this.mazePath.remove(this.mazePath.getCell(this.mazePath.getPosition(cellToAdd) + 1));
+                } else {
+                    const cellNeighbours = cellToAdd.getNeighbours();
 
-                for (let i = 0; i < cellNeighbours.length; i++) {
-                    const position = this.mazePath.getPosition(cellNeighbours[i]);
+                    for (let i = 0; i < cellNeighbours.length; i++) {
+                        const position = this.mazePath.getPosition(cellNeighbours[i]);
 
-                    if (position !== -1) {
-                        // TODO: prevent the removal if the last cell in the path is 
-                        // in cellNeighbours.
-                        const cellToRemove = this.mazePath.getCell(position + 1);
+                        if (position !== -1) {
+                            const cellToRemove = this.mazePath.getCell(position + 1);
 
-                        if (cellToRemove !== lastCellInPath) {
-                            this.mazePath.remove(cellToRemove);
+                            if (cellToRemove !== cellToAdd) {
+                                this.mazePath.remove(cellToRemove);
+                            }
                         }
                     }
                 }
-                this.mazePath.add(cell);
+
+                this.mazePath.add(cellToAdd);
             }
         }
     },
