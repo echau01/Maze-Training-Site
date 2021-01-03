@@ -27,19 +27,26 @@ class Cell {
      * Every cell is either open or closed. An open cell is a cell that can be in a maze path,
      * and a closed cell is a wall.
      * 
-     * @param {number} row the row of the cell
-     * @param {number} column the column of the cell
+     * @param {number} row the row of the cell. Must be a nonnegative integer.
+     * @param {number} column the column of the cell. Must be a nonnegative integer.
      * @param {boolean} open whether the cell is open or not
      * @param {maze} maze the maze this cell is in. The caller must update the maze's board to include
      * this new cell.
      */
     constructor(row, column, open, maze) {
+        if (row < 0) {
+            throw new Error("row parameter is negative");
+        }
+        if (column < 0) {
+            throw new Error("column parameter is negative");
+        }
+
         this.row = row;
         this.column = column;
         this.open = open;
         this.maze = maze;
 
-        // Make this.row and this.column immutable
+        // Makes this.row and this.column immutable
         Object.defineProperties(this, {
             "row": {
                 writable: false,
@@ -66,6 +73,26 @@ class Cell {
      */
     isOpen() {
         return this.open;
+    }
+
+    /**
+     * Returns true if this cell is a neighbour of otherCell in the maze; false otherwise.
+     * 
+     * Two cells are neighbours iff. they are in the same maze, and the sum of their horizontal 
+     * distance (in terms of number of columns) and their vertical distance (in terms of number of rows) 
+     * equals 1.
+     * 
+     * @param {Cell} otherCell the cell whose neighbourship with this cell we want to check
+     */
+    isNeighbour(otherCell) {
+        if (otherCell.maze === this.maze) {
+            const dx = otherCell.getColumn() - this.column;
+            const dy = otherCell.getRow() - this.row;
+
+            return Math.abs(dx) + Math.abs(dy) === 1;
+        }
+
+        return false;
     }
 
     /**
@@ -495,7 +522,7 @@ class MazePath {
                 for (let i = 0; i < cellNeighbours.length; i++) {
                     const curr = cellNeighbours[i];
 
-                    if (curr.getRow() === lastCell.getRow() && curr.getColumn() === lastCell.getColumn()) {
+                    if (curr === lastCell) {
                         this.cellPositions[cell.getRow()][cell.getColumn()] = this.path.length;
                         this.path.push(cell);
 
@@ -590,7 +617,16 @@ class MazePath {
      * bottom-right corner of the maze; false otherwise.
      */
     isComplete() {
+        for (let i = 0; i < this.path.length - 1; i++) {
+            const cell = this.path[i];
+            
+            if (!cell.isOpen() || !cell.isNeighbour(this.path[i + 1])) {
+                return false;
+            }
+        }
 
+        const lastCell = this.path[this.path.length - 1];
+        return lastCell.isOpen() && lastCell === this.maze.getCell(this.maze.getRows() - 1, this.maze.getColumns() - 1);
     }
 }
 
@@ -784,9 +820,10 @@ var maze = {
     height: 500,
     isUserMouseDown: false,
     mazePath: undefined,
+    mazeSolved: false,
 
     handleMouseDrag: function(canvas, event) {
-        if (this.isUserMouseDown && this._maze) {
+        if (this.isUserMouseDown && this._maze && !this.mazeSolved) {
             const rect = canvas.getBoundingClientRect();
             const canvasX = event.clientX - rect.x;
             const canvasY = event.clientY - rect.y;
@@ -819,12 +856,21 @@ var maze = {
                 }
 
                 this.mazePath.add(cellToAdd);
+
+                if (cellToAdd === this._maze.getCell(this._maze.getRows() - 1, this._maze.getColumns() - 1)) {
+                    if (this.mazePath.isComplete()) {
+                        alert("Congratulations! You solved the maze!\n\n" + 
+                            "If you want to try another maze, press the \"Generate a maze\" button.");
+                        this.mazeSolved = true;
+                    }
+                }
             }
         }
     },
 
     createMaze: function() {
         this.isUserMouseDown = false;
+        this.mazeSolved = false;
 
         const element = document.getElementById("mazeArea");
         element.innerHTML = "<canvas id=\"maze\" style=\"border:1px solid #000000\"></canvas>";
