@@ -487,7 +487,7 @@ class MazePath {
             if (this.path.length === 0) {
                 this.cellPositions[cell.getRow()][cell.getColumn()] = 0;
                 this.path.push(cell);
-                drawer.drawCircle(cell.getRow(), cell.getColumn());
+                drawer.drawEllipse(cell.getRow(), cell.getColumn());
             } else if (this.cellPositions[cell.getRow()][cell.getColumn()] === -1) {
                 const cellNeighbours = cell.getNeighbours();
                 const lastCell = this.path[this.path.length - 1];
@@ -697,7 +697,7 @@ class MazeDrawer {
                     const dy = nextCell.getRow() - cell.getRow();
                     this.drawLineSegment(cell.getRow(), cell.getColumn(), getDirection(dx, dy));
                 } else {
-                    this.drawCircle(cell.getRow(), cell.getColumn());
+                    this.drawEllipse(cell.getRow(), cell.getColumn());
                 }
 
                 if (prevCell) {
@@ -754,24 +754,26 @@ class MazeDrawer {
     }
 
     /**
-     * Draws a red circle in the middle of the cell at the given row and column.
+     * Draws a red ellipse in the middle of the cell at the given row and column.
      * 
-     * @param {number} row the row of the cell to draw the circle in
-     * @param {number} column the column of the cell to draw the circle in
+     * @param {number} row the row of the cell to draw the ellipse in
+     * @param {number} column the column of the cell to draw the ellipse in
      */
-    drawCircle(row, column) {
+    drawEllipse(row, column) {
         const ctx = this.canvas.getContext("2d");
         const cellWidth = this.canvas.width / this.maze.getColumns();
         const cellHeight = this.canvas.height / this.maze.getRows();
-
-        const radius = 0.2 * cellWidth;
 
         const x = column * cellWidth + cellWidth / 2;
         const y = row * cellHeight + cellHeight / 2;
 
         ctx.fillStyle = "#FF0000";
+        ctx.save();
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.translate(x, y);
+        ctx.scale(0.2 * cellWidth, 0.2 * cellHeight);
+        ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+        ctx.restore();
         ctx.fill();
     }
 }
