@@ -1,5 +1,4 @@
-# Maze Training
+# Maze Training Site
 
-A website where you can practice solving mazes. Like Leetcode, but for maze solving,
-and not nearly as difficult.
+This is the source code for a website where you can practice solving mazes.
 
