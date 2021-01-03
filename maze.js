@@ -815,12 +815,13 @@ class MazeDrawer {
 }
 
 var maze = {
-    _maze: undefined,
+    _maze: null,
     width: 1000,
     height: 500,
     isUserMouseDown: false,
-    mazePath: undefined,
+    mazePath: null,
     mazeSolved: false,
+    startTime: null,
 
     handleMouseDrag: function(canvas, event) {
         if (this.isUserMouseDown && this._maze && !this.mazeSolved) {
@@ -859,7 +860,10 @@ var maze = {
 
                 if (cellToAdd === this._maze.getCell(this._maze.getRows() - 1, this._maze.getColumns() - 1)) {
                     if (this.mazePath.isComplete()) {
-                        alert("Congratulations! You solved the maze!\n\n" + 
+                        const finishTime = new Date();
+                        const timeDelta = finishTime.getTime() - this.startTime.getTime();
+
+                        alert("Congratulations! You solved the maze in " + (timeDelta / 1000) + " seconds!\n\n" + 
                             "If you want to try another maze, press the \"Generate a maze\" button.");
                         this.mazeSolved = true;
                     }
@@ -888,6 +892,8 @@ var maze = {
         canvas.addEventListener("mousemove", function(event) {
             maze.handleMouseDrag(this, event);
         });
+
+        this.startTime = new Date();
     }
 };
 
