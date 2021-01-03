@@ -2,7 +2,7 @@ import Maze from "./maze.js";
 import MazePath from "./mazepath.js"
 
 
-const DIRECTIONS = {
+export const DIRECTIONS = {
     UP: 1,
     DOWN: 2,
     LEFT: 3,
