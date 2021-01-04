@@ -117,10 +117,10 @@ export default class Maze {
          * @param {number[][]} weights the weights of each cell in the maze
          */
         const updatePQ = (function (cell, pq, weights) {
-            let neighbours = this.neighbours(cell);
+            const neighbours = this.neighbours(cell);
 
             for (let i = 0; i < neighbours.length; i++) {
-                let cell = neighbours[i];
+                const cell = neighbours[i];
 
                 if (!cell.isOpen()) {
                     pq.insert(cell, weights[cell.row][cell.column]);
@@ -128,7 +128,7 @@ export default class Maze {
             }
         }).bind(this);
 
-        let weights = generateWeights();
+        const weights = generateWeights();
         let pq = new PriorityQueue();
         let visited = new Array(this.rows).fill(false).map(() => new Array(this.columns).fill(false));
 
@@ -137,8 +137,8 @@ export default class Maze {
 
         while (pq.size() !== 0) {
             let wall = pq.removeMin();
-            let neighbours = this.neighbours(wall);
-            let nextCell;
+            const neighbours = this.neighbours(wall);
+            let nextCell = null;
 
             for (let i = 0; i < neighbours.length; i++) {
                 if (!visited[neighbours[i].getRow()][neighbours[i].getColumn()] && neighbours[i].isOpen()) {
@@ -150,13 +150,13 @@ export default class Maze {
                 }
             }
 
-            // If nextCell is not undefined, then the if block in the for loop above must have run.
+            // If nextCell is not null, then the if block in the for loop above must have run.
             // That means there is an open, unvisited cell adjacent to the wall. Hence, we should
             // remove the wall. 
             //
-            // If nextCell is undefined, then both open cells adjacent to the wall have been visited. 
+            // If nextCell is null, then both open cells adjacent to the wall have been visited. 
             // In this case, there is a 3% that we remove the wall, creating a cycle in the maze.
-            if (nextCell !== undefined) {
+            if (nextCell) {
                 wall.setOpen(true);
                 visited[wall.getRow()][wall.getColumn()] = true;
                 visited[nextCell.getRow()][nextCell.getColumn()] = true;
@@ -177,8 +177,8 @@ export default class Maze {
      */
     neighbours(cell) {
         let result = [];
-        let row = cell.getRow();
-        let column = cell.getColumn();
+        const row = cell.getRow();
+        const column = cell.getColumn();
 
         for (let i = -1; i <= 1; i += 2) {
             if (0 <= row + i && row + i <= this.rows - 1) {

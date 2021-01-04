@@ -100,7 +100,7 @@ export default class PriorityQueue {
 
     heapifyUp(index) {
         while (index !== 0) {
-            let parent = this.parent(index);
+            const parent = this.parent(index);
             if (this.heap[index].priority < this.heap[parent].priority) {
                 this.heap.swap(index, parent);
                 index = parent;
@@ -112,8 +112,8 @@ export default class PriorityQueue {
 
     heapifyDown(index) {
         while (index <= Math.floor((this._size - 2) / 2)) {
-            let leftIdx = this.leftChild(index);
-            let rightIdx = this.rightChild(index);
+            const leftIdx = this.leftChild(index);
+            const rightIdx = this.rightChild(index);
 
             let minIdx;
             if (rightIdx < _size) {
