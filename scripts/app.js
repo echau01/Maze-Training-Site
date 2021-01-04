@@ -3,7 +3,7 @@ import MazePath from "./mazepath.js";
 
 
 var app = {
-    _maze: null,
+    maze: null,
     width: 1000,
     height: 500,
     isUserMouseDown: false,
@@ -12,18 +12,18 @@ var app = {
     startTime: null,
 
     handleMouseDrag: function(canvas, event) {
-        if (this.isUserMouseDown && this._maze && !this.mazeSolved) {
+        if (this.isUserMouseDown && this.maze && !this.mazeSolved) {
             const rect = canvas.getBoundingClientRect();
             const canvasX = event.clientX - rect.x;
             const canvasY = event.clientY - rect.y;
 
-            const cellWidth = canvas.width / this._maze.getColumns();
-            const cellHeight = canvas.height / this._maze.getRows();
+            const cellWidth = canvas.width / this.maze.getColumns();
+            const cellHeight = canvas.height / this.maze.getRows();
 
             const cellRow = Math.floor(canvasY / cellHeight);
             const cellColumn = Math.floor(canvasX / cellWidth);
 
-            const cellToAdd = this._maze.getCell(cellRow, cellColumn);
+            const cellToAdd = this.maze.getCell(cellRow, cellColumn);
 
             if (cellToAdd && cellToAdd.isOpen()) {
                 if (this.mazePath.isInPath(cellToAdd)) {
@@ -46,7 +46,7 @@ var app = {
 
                 this.mazePath.add(cellToAdd);
 
-                if (cellToAdd === this._maze.getCell(this._maze.getRows() - 1, this._maze.getColumns() - 1)) {
+                if (cellToAdd === this.maze.getCell(this.maze.getRows() - 1, this.maze.getColumns() - 1)) {
                     if (this.mazePath.isComplete()) {
                         const finishTime = new Date();
                         const timeDelta = finishTime.getTime() - this.startTime.getTime();
@@ -72,10 +72,10 @@ var app = {
         canvas.height = this.height;
 
         // Note: mazes look the best when the number of rows and columns are both odd.
-        this._maze = new Maze(25, 51, canvas);
-        this._maze.render();
-        this.mazePath = new MazePath(this._maze);
-        this.mazePath.add(this._maze.getCell(0, 0));
+        this.maze = new Maze(25, 51, canvas);
+        this.maze.render();
+        this.mazePath = new MazePath(this.maze);
+        this.mazePath.add(this.maze.getCell(0, 0));
 
         canvas.addEventListener("mousemove", function(event) {
             app.handleMouseDrag(this, event);

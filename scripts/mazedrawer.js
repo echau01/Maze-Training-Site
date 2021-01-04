@@ -53,7 +53,9 @@ export default class MazeDrawer {
         const cellHeight = this.canvas.height / this.maze.getRows();
 
         ctx.fillStyle = "#FFFFFF";
+        ctx.strokeStyle = "#000000";
         ctx.fillRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
+        ctx.strokeRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
     }
 
     /**
@@ -68,7 +70,9 @@ export default class MazeDrawer {
         const cellHeight = this.canvas.height / this.maze.getRows();
 
         ctx.fillStyle = "#000000";
+        ctx.strokeStyle = "#000000";
         ctx.fillRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
+        ctx.strokeRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
     }
 
     /**
