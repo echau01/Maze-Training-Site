@@ -1,5 +1,5 @@
 import Maze from "./maze.js";
-import MazePath from "./mazepath.js"
+import MazePath from "./mazepath.js";
 
 
 export const DIRECTIONS = {
@@ -42,34 +42,21 @@ export default class MazeDrawer {
     }
 
     /**
-     * Draws an open cell at the given row and column on this maze drawer's canvas element.
+     * Draws a cell at the given row and column on this maze drawer's canvas element.
+     * The cell is coloured according to the value of fillColour. No maze path is rendered
+     * on top of the cell. A black border is drawn around the cell.
      *
      * @param {number} row the row of the open cell to draw
      * @param {number} column the column of the open cell to draw
+     * @param {string} fillColour the hex colour code of the colour to fill the cell with.
+     * Must begin with the # symbol (e.g. "#FFFFFF" for white).
      */
-    drawOpenCell(row, column) {
+    drawPlainCell(row, column, fillColour) {
         const ctx = this.canvas.getContext("2d");
         const cellWidth = this.canvas.width / this.maze.getColumns();
         const cellHeight = this.canvas.height / this.maze.getRows();
 
-        ctx.fillStyle = "#FFFFFF";
-        ctx.strokeStyle = "#000000";
-        ctx.fillRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
-        ctx.strokeRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
-    }
-
-    /**
-     * Draws a closed cell at the given row and column on this maze drawer's canvas element.
-     *
-     * @param {number} row the row of the closed cell to draw
-     * @param {number} column the column of the closed cell to draw
-     */
-    drawClosedCell(row, column) {
-        const ctx = this.canvas.getContext("2d");
-        const cellWidth = this.canvas.width / this.maze.getColumns();
-        const cellHeight = this.canvas.height / this.maze.getRows();
-
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = fillColour;
         ctx.strokeStyle = "#000000";
         ctx.fillRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
         ctx.strokeRect(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
@@ -87,10 +74,12 @@ export default class MazeDrawer {
     drawCell(row, column, mazePath) {
         const cell = this.maze.getCell(row, column);
 
-        if (cell.isOpen()) {
-            this.drawOpenCell(cell.getRow(), cell.getColumn());
+        if (row === this.maze.getRows() - 1 && column === this.maze.getColumns() - 1) {
+            this.drawPlainCell(cell.getRow(), cell.getColumn(), "#00FF00"); // green
+        } else if (cell.isOpen()) {
+            this.drawPlainCell(cell.getRow(), cell.getColumn(), "#FFFFFF"); // white
         } else {
-            this.drawClosedCell(cell.getRow(), cell.getColumn());
+            this.drawPlainCell(cell.getRow(), cell.getColumn(), "#000000"); // black
         }
 
         if (mazePath) {
