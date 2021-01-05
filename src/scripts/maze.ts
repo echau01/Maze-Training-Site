@@ -1,12 +1,17 @@
-import Cell from "./cell.js";
-import MazeDrawer from "./mazedrawer.js";
-import PriorityQueue from "./priorityqueue.js";
+import Cell from "./cell";
+import MazeDrawer from "./mazedrawer";
+import PriorityQueue from "./priorityqueue";
 
 
 /**
  * Represents a maze rendered in an HTML canvas element.
  */
 export default class Maze {
+    private rows: number;
+    private columns: number;
+    private board: Cell[][];
+    private mazeDrawer: MazeDrawer;
+
     /**
      * Constructs a 2D maze with the given dimensions. The total size of the maze (equal
      * to the product of rows and columns) must be at least 1 and at most 2^31 - 1.
@@ -15,11 +20,11 @@ export default class Maze {
      * @param {number} columns the number of columns in the maze
      * @param {HTMLCanvasElement} canvasElement the canvas element that this maze will be rendered on
      */
-    constructor(rows, columns, canvasElement) {
-        if (rows > Math.floor(2147483647 / columns)) {
-            throw new Error("Maze size is too large.");
-        } else if (rows * columns === 0) {
+    constructor(rows: number, columns: number, canvasElement: HTMLCanvasElement) {
+        if (rows * columns === 0) {
             throw new Error("One of rows and columns is 0.");
+        } else if (rows > Math.floor(2147483647 / columns)) {
+            throw new Error("Maze size is too large.");
         }
 
         this.rows = rows;
@@ -34,11 +39,11 @@ export default class Maze {
      * - all cells in odd-indexed rows are closed, excluding the last row
      * - all cells in odd-indexed columns are closed, excluding the last column
      */
-    initBoard() {
-        let board = [];
+    initBoard(): Cell[][] {
+        let board: Cell[][] = [];
 
         for (let i = 0; i < this.rows; i++) {
-            let row = [];
+            let row: Cell[] = [];
 
             if (i % 2 === 0 || i === this.rows - 1) {
                 for (let j = 0; j < this.columns; j++) {
@@ -66,7 +71,7 @@ export default class Maze {
      * @param {number} row the row of the cell
      * @param {number} column the column of the cell
      */
-    isOpen(row, column) {
+    isOpen(row: number, column: number): boolean {
         return this.board[row][column].isOpen();
     }
 
@@ -74,18 +79,18 @@ export default class Maze {
      * Generates a random maze using Prim's algorithm. The generated maze is stored in
      * this.board, a 2D boolean array of cells.
      */
-    generateMaze() {
+    generateMaze(): void {
         /**
          * Puts each number from 0 to this.rows * this.columns - 1 into a random spot
          * in a 2D array with the same dimensions as the maze board. The function
          * then returns the 2D array.
          */
-        const generateWeights = (function () {
+        const generateWeights = (function (): number[][] {
             // We use the Fisher-Yates shuffle.
-            let weights = [];
+            let weights: number[][] = [];
 
             for (let i = 0; i < this.rows; i++) {
-                let currentRow = [];
+                let currentRow: number[] = [];
                 for (let j = 0; j < this.columns; j++) {
                     currentRow.push(i * this.columns + j);
                 }
@@ -93,15 +98,15 @@ export default class Maze {
             }
 
             for (let i = this.rows * this.columns - 1; i >= 0; i--) {
-                const row = Math.floor(i / this.columns);
-                const column = i % this.columns;
+                const row: number = Math.floor(i / this.columns);
+                const column: number = i % this.columns;
 
                 // rand is a random number between 0 and i inclusive.
-                const rand = Math.floor(Math.random() * (i + 1));
-                const randRow = Math.floor(rand / this.columns);
-                const randColumn = rand % this.columns;
+                const rand: number = Math.floor(Math.random() * (i + 1));
+                const randRow: number = Math.floor(rand / this.columns);
+                const randColumn: number = rand % this.columns;
 
-                const temp = weights[row][column];
+                const temp: number = weights[row][column];
                 weights[row][column] = weights[randRow][randColumn];
                 weights[randRow][randColumn] = temp;
             }
@@ -116,21 +121,21 @@ export default class Maze {
          * @param {PriorityQueue} pq the priority queue being used by the maze generator
          * @param {number[][]} weights the weights of each cell in the maze
          */
-        const updatePQ = (function (cell, pq, weights) {
-            const neighbours = this.neighbours(cell);
+        const updatePQ = (function (cell: Cell, pq: PriorityQueue, weights: number[][]): void {
+            const neighbours: Cell[] = this.neighbours(cell);
 
             for (let i = 0; i < neighbours.length; i++) {
-                const cell = neighbours[i];
+                const cell: Cell = neighbours[i];
 
                 if (!cell.isOpen()) {
-                    pq.insert(cell, weights[cell.row][cell.column]);
+                    pq.insert(cell, weights[cell.getRow()][cell.getColumn()]);
                 }
             }
         }).bind(this);
 
         const weights = generateWeights();
         let pq = new PriorityQueue();
-        let visited = new Array(this.rows).fill(false).map(() => new Array(this.columns).fill(false));
+        let visited: boolean[][] = new Array<boolean>(this.rows).fill(false).map(() => new Array<boolean>(this.columns).fill(false));
 
         visited[0][0] = true;
         updatePQ(this.board[0][0], pq, weights);
@@ -175,7 +180,7 @@ export default class Maze {
      *
      * @param {Cell} cell the cell whose neighbours we want
      */
-    neighbours(cell) {
+    neighbours(cell: Cell) {
         let result = [];
         const row = cell.getRow();
         const column = cell.getColumn();
@@ -196,21 +201,21 @@ export default class Maze {
     /**
      * Returns the number of rows in this maze.
      */
-    getRows() {
+    getRows(): number {
         return this.rows;
     }
 
     /**
      * Returns the number of columns in this maze.
      */
-    getColumns() {
+    getColumns(): number {
         return this.columns;
     }
 
     /**
      * Returns the MazeDrawer object that renders this maze.
      */
-    getMazeDrawer() {
+    getMazeDrawer(): MazeDrawer {
         return this.mazeDrawer;
     }
 
@@ -222,7 +227,7 @@ export default class Maze {
      * @param {number} row the row of the cell to get
      * @param {number} column the column of the cell to get
      */
-    getCell(row, column) {
+    getCell(row: number, column: number): Cell {
         if (0 <= row && row < this.rows) {
             if (0 <= column && column < this.columns) {
                 return this.board[row][column];
@@ -235,7 +240,7 @@ export default class Maze {
     /**
      * Renders this maze onto the canvas element associated with this maze.
      */
-    render() {
+    render(): void {
         this.mazeDrawer.drawMaze();
     }
 }

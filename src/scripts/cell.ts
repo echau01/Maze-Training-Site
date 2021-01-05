@@ -1,10 +1,15 @@
-import Maze from "./maze.js";
+import Maze from "./maze";
 
 
 /**
  * Represents a cell in a maze.
  */
 export default class Cell {
+    private readonly row: number;
+    private readonly column: number;
+    private open: boolean;
+    private maze: Maze;
+
     /**
      * Constructs a cell at the given row and column of the specified maze.
      *
@@ -17,7 +22,7 @@ export default class Cell {
      * @param {Maze} maze the maze this cell is in. The caller must update the maze's board to include
      * this new cell.
      */
-    constructor(row, column, open, maze) {
+    constructor(row: number, column: number, open: boolean, maze: Maze) {
         if (row < 0) {
             throw new Error("row parameter is negative");
         }
@@ -29,18 +34,6 @@ export default class Cell {
         this.column = column;
         this.open = open;
         this.maze = maze;
-
-        // Makes this.row and this.column immutable
-        Object.defineProperties(this, {
-            "row": {
-                writable: false,
-                configurable: false
-            },
-            "column": {
-                writable: false,
-                configurable: false
-            }
-        });
     }
 
     /**
@@ -48,14 +41,14 @@ export default class Cell {
      *
      * @param {boolean} open true if this cell is to be marked open; false otherwise
      */
-    setOpen(open) {
+    setOpen(open: boolean): void {
         this.open = open;
     }
 
     /**
      * Returns true if this cell is open; false otherwise.
      */
-    isOpen() {
+    isOpen(): boolean {
         return this.open;
     }
 
@@ -68,7 +61,7 @@ export default class Cell {
      *
      * @param {Cell} otherCell the cell whose neighbourship with this cell we want to check
      */
-    isNeighbour(otherCell) {
+    isNeighbour(otherCell: Cell): boolean {
         if (otherCell.maze === this.maze) {
             const dx = otherCell.getColumn() - this.column;
             const dy = otherCell.getRow() - this.row;
@@ -84,21 +77,28 @@ export default class Cell {
      * a cell are the cells exactly 1 unit above, below, to the left, and to the right
      * of the cell.
      */
-    getNeighbours() {
+    getNeighbours(): Cell[] {
         return this.maze.neighbours(this);
     }
 
     /**
      * Returns the row of this cell in the maze.
      */
-    getRow() {
+    getRow(): number {
         return this.row;
     }
 
     /**
      * Returns the column of this cell in the maze.
      */
-    getColumn() {
+    getColumn(): number {
         return this.column;
+    }
+
+    /**
+     * Returns the maze object that this cell is in.
+     */
+    getMaze(): Maze {
+        return this.maze;
     }
 }

@@ -1,5 +1,6 @@
-import Maze from "./maze.js";
-import MazePath from "./mazepath.js";
+import Cell from "./cell";
+import Maze from "./maze";
+import MazePath from "./mazepath";
 
 
 export const DIRECTIONS = {
@@ -13,6 +14,9 @@ export const DIRECTIONS = {
  * A class that renders mazes onto HTML canvas elements.
  */
 export default class MazeDrawer {
+    private maze: Maze;
+    private canvas: HTMLCanvasElement;
+    
     /**
      * Create a maze drawer that handles the rendering of the given maze onto
      * the given canvas element.
@@ -20,7 +24,7 @@ export default class MazeDrawer {
      * @param {Maze} maze
      * @param {HTMLCanvasElement} canvasElement
      */
-    constructor(maze, canvasElement) {
+    constructor(maze: Maze, canvasElement: HTMLCanvasElement) {
         this.maze = maze;
         this.canvas = canvasElement;
     }
@@ -33,7 +37,7 @@ export default class MazeDrawer {
      * @param {MazePath} [mazePath] the maze path to overlay on top of the maze.
      * This parameter is ignored if omitted.
      */
-    drawMaze(mazePath) {
+    drawMaze(mazePath?: MazePath): void {
         for (let row = 0; row < this.maze.getRows(); row++) {
             for (let column = 0; column < this.maze.getColumns(); column++) {
                 this.drawCell(row, column, mazePath);
@@ -51,10 +55,10 @@ export default class MazeDrawer {
      * @param {string} fillColour the hex colour code of the colour to fill the cell with.
      * Must begin with the # symbol (e.g. "#FFFFFF" for white).
      */
-    drawPlainCell(row, column, fillColour) {
-        const ctx = this.canvas.getContext("2d");
-        const cellWidth = this.canvas.width / this.maze.getColumns();
-        const cellHeight = this.canvas.height / this.maze.getRows();
+    drawPlainCell(row: number, column: number, fillColour: string): void {
+        const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
+        const cellWidth: number = this.canvas.width / this.maze.getColumns();
+        const cellHeight: number = this.canvas.height / this.maze.getRows();
 
         ctx.fillStyle = fillColour;
         ctx.strokeStyle = "#000000";
@@ -71,8 +75,8 @@ export default class MazeDrawer {
      * @param {number} column the column of the cell to draw
      * @param {MazePath} [mazePath] the maze path to render on top of the cell
      */
-    drawCell(row, column, mazePath) {
-        const cell = this.maze.getCell(row, column);
+    drawCell(row: number, column: number, mazePath?: MazePath): void {
+        const cell: Cell = this.maze.getCell(row, column);
 
         if (row === this.maze.getRows() - 1 && column === this.maze.getColumns() - 1) {
             this.drawPlainCell(cell.getRow(), cell.getColumn(), "#00FF00"); // green
@@ -83,7 +87,7 @@ export default class MazeDrawer {
         }
 
         if (mazePath) {
-            const position = mazePath.getPosition(cell);
+            const position: number = mazePath.getPosition(cell);
 
             if (position !== -1) {
                 /**
@@ -92,7 +96,7 @@ export default class MazeDrawer {
                  * or DIRECTIONS.RIGHT depending on which direction the vector (dx, dy)
                  * points towards. Note that a positive dy indicates a downward-pointing vector.
                  */
-                const getDirection = function (dx, dy) {
+                const getDirection = function (dx: number, dy: number): any {
                     if (dx === 0) {
                         return dy === 1 ? DIRECTIONS.DOWN : DIRECTIONS.UP;
                     } else {
@@ -100,20 +104,20 @@ export default class MazeDrawer {
                     }
                 };
 
-                const nextCell = mazePath.getCell(position + 1);
-                const prevCell = mazePath.getCell(position - 1);
+                const nextCell: Cell = mazePath.getCell(position + 1);
+                const prevCell: Cell = mazePath.getCell(position - 1);
 
                 if (nextCell) {
-                    const dx = nextCell.getColumn() - cell.getColumn();
-                    const dy = nextCell.getRow() - cell.getRow();
+                    const dx: number = nextCell.getColumn() - cell.getColumn();
+                    const dy: number = nextCell.getRow() - cell.getRow();
                     this.drawLineSegment(cell.getRow(), cell.getColumn(), getDirection(dx, dy));
                 } else {
                     this.drawEllipse(cell.getRow(), cell.getColumn());
                 }
 
                 if (prevCell) {
-                    const dx = prevCell.getColumn() - cell.getColumn();
-                    const dy = prevCell.getRow() - cell.getRow();
+                    const dx: number = prevCell.getColumn() - cell.getColumn();
+                    const dy: number = prevCell.getRow() - cell.getRow();
                     this.drawLineSegment(cell.getRow(), cell.getColumn(), getDirection(dx, dy));
                 }
             }
@@ -129,19 +133,19 @@ export default class MazeDrawer {
      * @param {*} direction the direction to draw the line segment in, starting from the middle of the cell.
      * Must be one of DIRECTIONS.UP, DIRECTIONS.DOWN, DIRECTIONS.LEFT, or DIRECTIONS.RIGHT.
      */
-    drawLineSegment(row, column, direction) {
-        const ctx = this.canvas.getContext("2d");
-        const cellWidth = this.canvas.width / this.maze.getColumns();
-        const cellHeight = this.canvas.height / this.maze.getRows();
+    drawLineSegment(row: number, column: number, direction: any): void {
+        const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
+        const cellWidth: number = this.canvas.width / this.maze.getColumns();
+        const cellHeight: number = this.canvas.height / this.maze.getRows();
 
         // The line segment is really a rectangle.
         // Top left corner of the line segment
-        let x = column * cellWidth;
-        let y = row * cellHeight;
+        let x: number = column * cellWidth;
+        let y: number = row * cellHeight;
 
         // Dimensions of the line segment
-        let dx = 0.2 * cellWidth;
-        let dy = 0.2 * cellHeight;
+        let dx: number = 0.2 * cellWidth;
+        let dy: number = 0.2 * cellHeight;
 
         if (direction === DIRECTIONS.UP || direction === DIRECTIONS.DOWN) {
             if (direction === DIRECTIONS.DOWN) {
@@ -169,13 +173,13 @@ export default class MazeDrawer {
      * @param {number} row the row of the cell to draw the ellipse in
      * @param {number} column the column of the cell to draw the ellipse in
      */
-    drawEllipse(row, column) {
-        const ctx = this.canvas.getContext("2d");
-        const cellWidth = this.canvas.width / this.maze.getColumns();
-        const cellHeight = this.canvas.height / this.maze.getRows();
+    drawEllipse(row: number, column: number): void {
+        const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
+        const cellWidth: number = this.canvas.width / this.maze.getColumns();
+        const cellHeight: number = this.canvas.height / this.maze.getRows();
 
-        const x = column * cellWidth + cellWidth / 2;
-        const y = row * cellHeight + cellHeight / 2;
+        const x: number = column * cellWidth + cellWidth / 2;
+        const y: number = row * cellHeight + cellHeight / 2;
 
         ctx.fillStyle = "#FF0000";
         ctx.save();

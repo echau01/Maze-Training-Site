@@ -1,28 +1,46 @@
 /**
- * Swaps the elements at index1 and index2 of this array.
+ * Swaps the elements at index1 and index2 of the given array.
  * 
+ * @param {any[]} arr the array to perform the swap on
  * @param {number} index1 the index of the first element to swap
  * @param {number} index2 the index of the second element to swap
  */
-Array.prototype.swap = function(index1, index2) {
-    const temp = this[index1];
-    this[index1] = this[index2];
-    this[index2] = temp;
+function swap(arr: any[], index1: number, index2: number): void {
+    const temp: any = arr[index1];
+    arr[index1] = arr[index2];
+    arr[index2] = temp;
 }
 
 /**
  * Represents an element in a priority queue.
  */
 class PriorityQueueElement {
+    private data: any;
+    private priority: number;
+
     /**
      * Create a priority queue element with the given priority that contains the given data.
      * 
      * @param {any} data the data this element contains
      * @param {number} priority the priority of the element
      */
-    constructor(data, priority) {
+    constructor(data: any, priority: number) {
         this.data = data;
         this.priority = priority;
+    }
+
+    /**
+     * Returns the data stored in this priority queue element.
+     */
+    getData(): any {
+        return this.data;
+    }
+
+    /**
+     * Returns the priority of this priority queue element.
+     */
+    getPriority(): number {
+        return this.priority;
     }
 }
 
@@ -30,13 +48,16 @@ class PriorityQueueElement {
  * A priority queue implemented as a 0-based binary minheap.
  */
 export default class PriorityQueue {
+    private heap: PriorityQueueElement[]
+    private _size: number;
+
     /**
      * Constructs a priority queue with the given PriorityQueueElements. If no parameter is passed
      * in to the constructor, an empty priority queue is created.
      *
      * @param {PriorityQueueElement[]} [queueElements] the elements of the priority queue to be constructed
      */
-    constructor(queueElements) {
+    constructor(queueElements?: PriorityQueueElement[]) {
         if (queueElements === undefined) {
             this.heap = [];
             this._size = 0;
@@ -54,7 +75,7 @@ export default class PriorityQueue {
      * @param {any} element the element to insert
      * @param {number} priority the priority of the element
      */
-    insert(element, priority) {
+    insert(element: any, priority: number): void {
         this.heap.push(new PriorityQueueElement(element, priority));
         this._size += 1;
         this.heapifyUp(this._size - 1);
@@ -63,46 +84,47 @@ export default class PriorityQueue {
     /**
      * Removes and returns the element with minimum priority in the queue.
      */
-    removeMin() {
-        this.heap.swap(0, this._size - 1);
+    removeMin(): any {
+        swap(this.heap, 0, this._size - 1);
         this._size -= 1;
 
-        return this.heap.pop().data;
+        return this.heap.pop().getData();
     }
 
     /**
      * Returns the number of elements in this priority queue.
      */
-    size() {
+    size(): number {
         return this._size;
     }
 
     /**
      * Converts this.heap to a binary minheap.
      */
-    buildHeap() {
+    buildHeap(): void {
         for (let i = Math.floor((this._size - 2) / 2); i >= 0; i--) {
             this.heapifyDown(i);
         }
     }
 
-    parent(index) {
+    parent(index: number): number {
         return Math.floor((index - 1) / 2);
     }
 
-    leftChild(index) {
+    leftChild(index: number): number {
         return 2 * index + 1;
     }
 
-    rightChild(index) {
+    rightChild(index: number): number {
         return 2 * index + 2;
     }
 
-    heapifyUp(index) {
+    heapifyUp(index: number): void {
         while (index !== 0) {
-            const parent = this.parent(index);
-            if (this.heap[index].priority < this.heap[parent].priority) {
-                this.heap.swap(index, parent);
+            const parent: number = this.parent(index);
+
+            if (this.heap[index].getPriority() < this.heap[parent].getPriority()) {
+                swap(this.heap, index, parent);
                 index = parent;
             } else {
                 break;
@@ -110,20 +132,24 @@ export default class PriorityQueue {
         }
     }
 
-    heapifyDown(index) {
+    heapifyDown(index: number): void {
         while (index <= Math.floor((this._size - 2) / 2)) {
-            const leftIdx = this.leftChild(index);
-            const rightIdx = this.rightChild(index);
-
-            let minIdx;
-            if (rightIdx < _size) {
-                minIdx = this.heap[leftIdx].priority < this.heap[rightIdx].priority ? leftIdx : rightIdx;
+            const leftIdx: number = this.leftChild(index);
+            const rightIdx: number = this.rightChild(index);
+            
+            let minIdx: number;
+            if (rightIdx < this._size) {
+                if (this.heap[leftIdx].getPriority() < this.heap[rightIdx].getPriority()) {
+                    minIdx = leftIdx;
+                } else {
+                    minIdx = rightIdx;
+                }
             } else {
                 minIdx = leftIdx;
             }
 
-            if (this.heap[index].priority > this.heap[minIdx].priority) {
-                this.heap.swap(index, minIdx);
+            if (this.heap[index].getPriority() > this.heap[minIdx].getPriority()) {
+                swap(this.heap, index, minIdx);
                 index = minIdx;
             } else {
                 break;
