@@ -66,16 +66,6 @@ export default class Maze {
     }
 
     /**
-     * Returns true if the cell at (row, column) is open; false otherwise.
-     *
-     * @param {number} row the row of the cell
-     * @param {number} column the column of the cell
-     */
-    isOpen(row: number, column: number): boolean {
-        return this.board[row][column].isOpen();
-    }
-
-    /**
      * Generates a random maze using Prim's algorithm. The generated maze is stored in
      * this.board, a 2D boolean array of cells.
      */
@@ -85,7 +75,7 @@ export default class Maze {
          * in a 2D array with the same dimensions as the maze board. The function
          * then returns the 2D array.
          */
-        const generateWeights = (function (): number[][] {
+        const generateWeights = () => {
             // We use the Fisher-Yates shuffle.
             let weights: number[][] = [];
 
@@ -112,7 +102,7 @@ export default class Maze {
             }
 
             return weights;
-        }).bind(this);
+        };
 
         /**
          * Inserts the walls adjacent to the given cell into the priority queue.
@@ -121,7 +111,7 @@ export default class Maze {
          * @param {PriorityQueue} pq the priority queue being used by the maze generator
          * @param {number[][]} weights the weights of each cell in the maze
          */
-        const updatePQ = (function (cell: Cell, pq: PriorityQueue, weights: number[][]): void {
+        const updatePQ = (cell: Cell, pq: PriorityQueue, weights: number[][]) => {
             const neighbours: Cell[] = this.neighbours(cell);
 
             for (let i = 0; i < neighbours.length; i++) {
@@ -131,7 +121,7 @@ export default class Maze {
                     pq.insert(cell, weights[cell.getRow()][cell.getColumn()]);
                 }
             }
-        }).bind(this);
+        };
 
         const weights = generateWeights();
         let pq = new PriorityQueue();
@@ -171,6 +161,16 @@ export default class Maze {
                 visited[wall.getRow()][wall.getColumn()] = true;
             }
         }
+    }
+
+    /**
+     * Returns true if the cell at (row, column) is open; false otherwise.
+     *
+     * @param {number} row the row of the cell
+     * @param {number} column the column of the cell
+     */
+    isOpen(row: number, column: number): boolean {
+        return this.board[row][column].isOpen();
     }
 
     /**
