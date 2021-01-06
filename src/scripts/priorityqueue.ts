@@ -101,25 +101,25 @@ export default class PriorityQueue {
     /**
      * Converts this.heap to a binary minheap.
      */
-    buildHeap(): void {
+    private buildHeap(): void {
         for (let i = Math.floor((this._size - 2) / 2); i >= 0; i--) {
             this.heapifyDown(i);
         }
     }
 
-    parent(index: number): number {
+    private parent(index: number): number {
         return Math.floor((index - 1) / 2);
     }
 
-    leftChild(index: number): number {
+    private leftChild(index: number): number {
         return 2 * index + 1;
     }
 
-    rightChild(index: number): number {
+    private rightChild(index: number): number {
         return 2 * index + 2;
     }
 
-    heapifyUp(index: number): void {
+    private heapifyUp(index: number): void {
         while (index !== 0) {
             const parent: number = this.parent(index);
 
@@ -132,7 +132,7 @@ export default class PriorityQueue {
         }
     }
 
-    heapifyDown(index: number): void {
+    private heapifyDown(index: number): void {
         while (index <= Math.floor((this._size - 2) / 2)) {
             const leftIdx: number = this.leftChild(index);
             const rightIdx: number = this.rightChild(index);

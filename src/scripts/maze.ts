@@ -39,7 +39,7 @@ export default class Maze {
      * - all cells in odd-indexed rows are closed, excluding the last row
      * - all cells in odd-indexed columns are closed, excluding the last column
      */
-    initBoard(): Cell[][] {
+    private initBoard(): Cell[][] {
         let board: Cell[][] = [];
 
         for (let i = 0; i < this.rows; i++) {
@@ -79,7 +79,7 @@ export default class Maze {
      * Generates a random maze using Prim's algorithm. The generated maze is stored in
      * this.board, a 2D boolean array of cells.
      */
-    generateMaze(): void {
+    private generateMaze(): void {
         /**
          * Puts each number from 0 to this.rows * this.columns - 1 into a random spot
          * in a 2D array with the same dimensions as the maze board. The function
