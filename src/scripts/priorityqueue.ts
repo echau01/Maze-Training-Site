@@ -14,17 +14,17 @@ function swap(arr: any[], index1: number, index2: number): void {
 /**
  * Represents an element in a priority queue.
  */
-class PriorityQueueElement {
-    private data: any;
+export class PriorityQueueElement<T> {
+    private data: T;
     private priority: number;
 
     /**
      * Create a priority queue element with the given priority that contains the given data.
      * 
-     * @param {any} data the data this element contains
+     * @param {T} data the data this element contains
      * @param {number} priority the priority of the element
      */
-    constructor(data: any, priority: number) {
+    constructor(data: T, priority: number) {
         this.data = data;
         this.priority = priority;
     }
@@ -32,7 +32,7 @@ class PriorityQueueElement {
     /**
      * Returns the data stored in this priority queue element.
      */
-    getData(): any {
+    getData(): T {
         return this.data;
     }
 
@@ -47,17 +47,17 @@ class PriorityQueueElement {
 /**
  * A priority queue implemented as a 0-based binary minheap.
  */
-export default class PriorityQueue {
-    private heap: PriorityQueueElement[]
+export class PriorityQueue<T> {
+    private heap: PriorityQueueElement<T>[]
     private _size: number;
 
     /**
      * Constructs a priority queue with the given PriorityQueueElements. If no parameter is passed
      * in to the constructor, an empty priority queue is created.
      *
-     * @param {PriorityQueueElement[]} [queueElements] the elements of the priority queue to be constructed
+     * @param {PriorityQueueElement<T>[]} [queueElements] the elements of the priority queue to be constructed
      */
-    constructor(queueElements?: PriorityQueueElement[]) {
+    constructor(queueElements?: PriorityQueueElement<T>[]) {
         if (queueElements === undefined) {
             this.heap = [];
             this._size = 0;
@@ -72,11 +72,11 @@ export default class PriorityQueue {
     /**
      * Inserts the given element with specified priority into the priority queue.
      *
-     * @param {any} element the element to insert
+     * @param {T} element the element to insert
      * @param {number} priority the priority of the element
      */
-    insert(element: any, priority: number): void {
-        this.heap.push(new PriorityQueueElement(element, priority));
+    insert(element: T, priority: number): void {
+        this.heap.push(new PriorityQueueElement<T>(element, priority));
         this._size += 1;
         this.heapifyUp(this._size - 1);
     }
@@ -84,7 +84,7 @@ export default class PriorityQueue {
     /**
      * Removes and returns the element with minimum priority in the queue.
      */
-    removeMin(): any {
+    removeMin(): T {
         swap(this.heap, 0, this._size - 1);
         this._size -= 1;
 

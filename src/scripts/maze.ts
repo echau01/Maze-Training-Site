@@ -1,6 +1,6 @@
 import Cell from "./cell";
 import MazeDrawer from "./mazedrawer";
-import PriorityQueue from "./priorityqueue";
+import { PriorityQueue } from "./priorityqueue";
 
 
 /**
@@ -108,10 +108,10 @@ export default class Maze {
          * Inserts the walls adjacent to the given cell into the priority queue.
          *
          * @param {Cell} cell the cell whose adjacent walls we want to insert into the priority queue
-         * @param {PriorityQueue} pq the priority queue being used by the maze generator
+         * @param {PriorityQueue<Cell>} pq the priority queue being used by the maze generator
          * @param {number[][]} weights the weights of each cell in the maze
          */
-        const updatePQ = (cell: Cell, pq: PriorityQueue, weights: number[][]) => {
+        const updatePQ = (cell: Cell, pq: PriorityQueue<Cell>, weights: number[][]) => {
             const neighbours: Cell[] = this.neighbours(cell);
 
             for (let i = 0; i < neighbours.length; i++) {
@@ -123,17 +123,17 @@ export default class Maze {
             }
         };
 
-        const weights = generateWeights();
-        let pq = new PriorityQueue();
+        const weights: number[][] = generateWeights();
+        let pq: PriorityQueue<Cell> = new PriorityQueue<Cell>();
         let visited: boolean[][] = new Array<boolean>(this.rows).fill(false).map(() => new Array<boolean>(this.columns).fill(false));
 
         visited[0][0] = true;
         updatePQ(this.board[0][0], pq, weights);
 
         while (pq.size() !== 0) {
-            let wall = pq.removeMin();
-            const neighbours = this.neighbours(wall);
-            let nextCell = null;
+            let wall: Cell = pq.removeMin();
+            const neighbours: Cell[] = this.neighbours(wall);
+            let nextCell: Cell = null;
 
             for (let i = 0; i < neighbours.length; i++) {
                 if (!visited[neighbours[i].getRow()][neighbours[i].getColumn()] && neighbours[i].isOpen()) {
@@ -180,10 +180,10 @@ export default class Maze {
      *
      * @param {Cell} cell the cell whose neighbours we want
      */
-    neighbours(cell: Cell) {
-        let result = [];
-        const row = cell.getRow();
-        const column = cell.getColumn();
+    neighbours(cell: Cell): Cell[] {
+        let result: Cell[] = [];
+        const row: number = cell.getRow();
+        const column: number = cell.getColumn();
 
         for (let i = -1; i <= 1; i += 2) {
             if (0 <= row + i && row + i <= this.rows - 1) {
