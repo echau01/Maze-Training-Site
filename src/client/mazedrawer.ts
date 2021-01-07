@@ -1,14 +1,8 @@
 import Cell from "./cell";
+import Direction from "./direction"
 import Maze from "./maze";
 import MazePath from "./mazepath";
 
-
-export const DIRECTIONS = {
-    UP: 1,
-    DOWN: 2,
-    LEFT: 3,
-    RIGHT: 4
-}
 
 /**
  * A class that renders mazes onto HTML canvas elements.
@@ -92,15 +86,15 @@ export default class MazeDrawer {
             if (position !== -1) {
                 /**
                  * Assumes (dx, dy) is one of (0, -1), (0, 1), (-1, 0), or (1, 0).
-                 * Returns one of DIRECTIONS.UP, DIRECTIONS.DOWN, DIRECTIONS.LEFT,
-                 * or DIRECTIONS.RIGHT depending on which direction the vector (dx, dy)
+                 * Returns one of Direction.UP, Direction.DOWN, Direction.LEFT,
+                 * or Direction.RIGHT depending on which direction the vector (dx, dy)
                  * points towards. Note that a positive dy indicates a downward-pointing vector.
                  */
-                const getDirection = function (dx: number, dy: number): any {
+                const getDirection = function (dx: number, dy: number): Direction {
                     if (dx === 0) {
-                        return dy === 1 ? DIRECTIONS.DOWN : DIRECTIONS.UP;
+                        return dy === 1 ? Direction.DOWN : Direction.UP;
                     } else {
-                        return dx === 1 ? DIRECTIONS.RIGHT : DIRECTIONS.LEFT;
+                        return dx === 1 ? Direction.RIGHT : Direction.LEFT;
                     }
                 };
 
@@ -130,10 +124,9 @@ export default class MazeDrawer {
      *
      * @param {number} row the row of the cell to draw the line segment in
      * @param {number} column the column of the cell to draw the line segment in
-     * @param {*} direction the direction to draw the line segment in, starting from the middle of the cell.
-     * Must be one of DIRECTIONS.UP, DIRECTIONS.DOWN, DIRECTIONS.LEFT, or DIRECTIONS.RIGHT.
+     * @param {Direction} direction the direction to draw the line segment in, starting from the middle of the cell.
      */
-    drawLineSegment(row: number, column: number, direction: any): void {
+    drawLineSegment(row: number, column: number, direction: Direction): void {
         const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
         const cellWidth: number = this.canvas.width / this.maze.getColumns();
         const cellHeight: number = this.canvas.height / this.maze.getRows();
@@ -147,15 +140,15 @@ export default class MazeDrawer {
         let dx: number = 0.2 * cellWidth;
         let dy: number = 0.2 * cellHeight;
 
-        if (direction === DIRECTIONS.UP || direction === DIRECTIONS.DOWN) {
-            if (direction === DIRECTIONS.DOWN) {
+        if (direction === Direction.UP || direction === Direction.DOWN) {
+            if (direction === Direction.DOWN) {
                 y += (cellHeight - dy) / 2;
             }
 
             x += (cellWidth - dx) / 2;
             dy = (cellHeight + dy) / 2;
         } else {
-            if (direction === DIRECTIONS.RIGHT) {
+            if (direction === Direction.RIGHT) {
                 x += (cellWidth - dx) / 2;
             }
 
