@@ -1,5 +1,5 @@
 stories.txt
 /node_modules/
-/dist/bundle.js
-/dist/bundle.js.map
+/dist/client/bundle.js
+/dist/client/bundle.js.map
 /dist/server/
