@@ -14,7 +14,7 @@
     "webpack-cli": "^4.3.1"
   },
   "scripts": {
-    "start": "npx webpack && node ./dist/server/index.js",
+    "start": "npx webpack && tsc && node ./dist/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
