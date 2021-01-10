@@ -1,16 +1,14 @@
 import Cell from "./cell";
-import MazeDrawer from "./mazedrawer";
 import { PriorityQueue } from "./priorityqueue";
 
 
 /**
- * Represents a maze rendered in an HTML canvas element.
+ * Represents a maze, comprised of a 2D grid of open or closed cells.
  */
 export default class Maze {
     private rows: number;
     private columns: number;
     private board: Cell[][];
-    private mazeDrawer: MazeDrawer;
 
     /**
      * Constructs a 2D maze with the given dimensions. The total size of the maze (equal
@@ -18,9 +16,8 @@ export default class Maze {
      *
      * @param {number} rows the number of rows in the maze
      * @param {number} columns the number of columns in the maze
-     * @param {HTMLCanvasElement} canvasElement the canvas element that this maze will be rendered on
      */
-    constructor(rows: number, columns: number, canvasElement: HTMLCanvasElement) {
+    constructor(rows: number, columns: number) {
         if (rows * columns === 0) {
             throw new Error("One of rows and columns is 0.");
         } else if (rows > Math.floor(2147483647 / columns)) {
@@ -31,7 +28,6 @@ export default class Maze {
         this.columns = columns;
         this.board = this.initBoard();
         this.generateMaze();
-        this.mazeDrawer = new MazeDrawer(this, canvasElement);
     }
 
     /**
@@ -213,13 +209,6 @@ export default class Maze {
     }
 
     /**
-     * Returns the MazeDrawer object that renders this maze.
-     */
-    getMazeDrawer(): MazeDrawer {
-        return this.mazeDrawer;
-    }
-
-    /**
      * Returns the cell at the given row and column in this maze, assuming
      * that the row and column are in the bounds of the maze board. If that
      * assumption is not true, returns null.
@@ -235,12 +224,5 @@ export default class Maze {
         }
 
         return null;
-    }
-
-    /**
-     * Renders this maze onto the canvas element associated with this maze.
-     */
-    render(): void {
-        this.mazeDrawer.drawMaze();
     }
 }

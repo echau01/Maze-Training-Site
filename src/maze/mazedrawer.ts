@@ -183,4 +183,11 @@ export default class MazeDrawer {
         ctx.restore();
         ctx.fill();
     }
+
+    /**
+     * Returns the maze that this maze drawer is responsible for rendering.
+     */
+    getMaze(): Maze {
+        return this.maze;
+    }
 }

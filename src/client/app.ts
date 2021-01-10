@@ -1,6 +1,7 @@
-import Cell from "./cell"
-import Maze from "./maze";
-import MazePath from "./mazepath";
+import Cell from "../maze/cell"
+import Maze from "../maze/maze";
+import MazeDrawer from "../maze/mazedrawer";
+import MazePath from "../maze/mazepath";
 
 var isUserMouseDown: boolean = false;
 var gameInstance: MazeGame;
@@ -11,6 +12,7 @@ var gameInstance: MazeGame;
 class MazeGame {
     private maze: Maze;
     private mazePath: MazePath;
+    private mazeDrawer: MazeDrawer;
     private isMazeSolved: boolean;
     private startTime: Date;
 
@@ -30,9 +32,10 @@ class MazeGame {
         canvas.height = canvasHeight;
 
         // Note: mazes look the best when the number of rows and columns are both odd.
-        this.maze = new Maze(25, 51, canvas);
-        this.maze.render();
-        this.mazePath = new MazePath(this.maze);
+        this.maze = new Maze(25, 51);
+        this.mazeDrawer = new MazeDrawer(this.maze, canvas);
+        this.mazeDrawer.drawMaze();
+        this.mazePath = new MazePath(this.mazeDrawer);
         this.mazePath.add(this.maze.getCell(0, 0));
 
         canvas.addEventListener("mousemove", (event: MouseEvent) => {

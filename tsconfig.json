@@ -6,6 +6,6 @@
         "rootDir": "./src",
         "lib": ["ES6", "DOM"]
     },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "src/client"]
+    "include": ["src/server/**/*"],
+    "exclude": ["node_modules"]
 }

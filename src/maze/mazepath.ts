@@ -10,18 +10,21 @@ import MazeDrawer from "./mazedrawer";
  * 3. Every cell in the path is an open cell and is in the maze.
  */
 export default class MazePath {
-    private maze: Maze;
+    private mazeDrawer: MazeDrawer;
     private path: Cell[];
     private cellPositions: number[][];
 
     /**
-     * Constructs an empty path through the given maze.
+     * Constructs an empty maze path. The MazeDrawer object passed into the constructor
+     * determines the Maze that this maze path travels through, because any MazeDrawer
+     * object has access to a Maze object.
      *
-     * @param {Maze} maze the maze that the path will travel through
+     * @param {MazeDrawer} mazeDrawer the MazeDrawer object that renders this maze path
      */
-    constructor(maze: Maze) {
-        this.maze = maze;
+    constructor(mazeDrawer: MazeDrawer) {
+        this.mazeDrawer = mazeDrawer;
         this.path = [];
+        const maze: Maze = this.mazeDrawer.getMaze();
         this.cellPositions = new Array<number>(maze.getRows()).fill(-1).map(() => new Array<number>(maze.getColumns()).fill(-1));
     }
 
@@ -39,13 +42,11 @@ export default class MazePath {
      * @param {Cell} cell the cell to add to this maze path
      */
     add(cell: Cell): void {
-        if (cell && cell.getMaze() === this.maze && cell.isOpen()) {
-            const drawer: MazeDrawer = this.maze.getMazeDrawer();
-
+        if (cell && cell.getMaze() === this.mazeDrawer.getMaze() && cell.isOpen()) {
             if (this.path.length === 0) {
                 this.cellPositions[cell.getRow()][cell.getColumn()] = 0;
                 this.path.push(cell);
-                drawer.drawEllipse(cell.getRow(), cell.getColumn());
+                this.mazeDrawer.drawEllipse(cell.getRow(), cell.getColumn());
             } else if (this.cellPositions[cell.getRow()][cell.getColumn()] === -1) {
                 const cellNeighbours: Cell[] = cell.getNeighbours();
                 const lastCell: Cell = this.path[this.path.length - 1];
@@ -57,8 +58,8 @@ export default class MazePath {
                         this.cellPositions[cell.getRow()][cell.getColumn()] = this.path.length;
                         this.path.push(cell);
 
-                        drawer.drawCell(lastCell.getRow(), lastCell.getColumn(), this);
-                        drawer.drawCell(cell.getRow(), cell.getColumn(), this);
+                        this.mazeDrawer.drawCell(lastCell.getRow(), lastCell.getColumn(), this);
+                        this.mazeDrawer.drawCell(cell.getRow(), cell.getColumn(), this);
 
                         break;
                     }
@@ -76,8 +77,7 @@ export default class MazePath {
      * @param {Cell} cell the cell to remove from this maze path
      */
     remove(cell: Cell): void {
-        if (cell && cell.getMaze() === this.maze) {
-            const drawer: MazeDrawer = this.maze.getMazeDrawer();
+        if (cell && cell.getMaze() === this.mazeDrawer.getMaze()) {
             const position: number = this.cellPositions[cell.getRow()][cell.getColumn()];
 
             if (position !== -1) {
@@ -88,13 +88,13 @@ export default class MazePath {
                     // We omit the maze path from the function arguments because we are
                     // removing currentCell from the path, so we do not want currentCell
                     // to be rendered with a path.
-                    drawer.drawCell(currentCell.getRow(), currentCell.getColumn(), this);
+                    this.mazeDrawer.drawCell(currentCell.getRow(), currentCell.getColumn(), this);
                 }
 
                 this.path.length = position;
 
                 const lastCell: Cell = this.path[this.path.length - 1];
-                drawer.drawCell(lastCell.getRow(), lastCell.getColumn(), this);
+                this.mazeDrawer.drawCell(lastCell.getRow(), lastCell.getColumn(), this);
             }
         }
     }
@@ -106,7 +106,7 @@ export default class MazePath {
      * @param {Cell} cell the cell whose position we want
      */
     getPosition(cell: Cell): number {
-        if (cell.getMaze() === this.maze) {
+        if (cell.getMaze() === this.mazeDrawer.getMaze()) {
             return this.cellPositions[cell.getRow()][cell.getColumn()];
         }
 
@@ -157,6 +157,8 @@ export default class MazePath {
         }
 
         const lastCell: Cell = this.path[this.path.length - 1];
-        return lastCell.isOpen() && lastCell === this.maze.getCell(this.maze.getRows() - 1, this.maze.getColumns() - 1);
+        const maze: Maze = this.mazeDrawer.getMaze();
+
+        return lastCell.isOpen() && lastCell === maze.getCell(maze.getRows() - 1, maze.getColumns() - 1);
     }
 }
