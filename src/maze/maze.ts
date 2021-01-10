@@ -13,19 +13,11 @@ export default class Maze {
     /**
      * Constructs a 2D maze with the given dimensions. The total size of the maze (equal
      * to the product of rows and columns) must be at least 1 and at most 2^31 - 1.
-     * 
-     * If initializeBoard is true, then the maze board will be initialized with a
-     * randomly-generated grid of cells. If initalizeBoard is false, then the maze board 
-     * is set to null. If the parameter is omitted, we fully initialize the maze board 
-     * (as though initializeBoard were true). Generally, this parameter should be omitted;
-     * it should only be set to false for internal use inside the Maze class (where the maze 
-     * board can be separately assigned).
      *
      * @param {number} rows the number of rows in the maze
      * @param {number} columns the number of columns in the maze
-     * @param {boolean} [initializeBoard] whether to initialize the maze board or not
      */
-    constructor(rows: number, columns: number, initializeBoard?: boolean) {
+    constructor(rows: number, columns: number) {
         if (rows * columns === 0) {
             throw new Error("One of rows and columns is 0.");
         } else if (rows > Math.floor(2147483647 / columns)) {
@@ -34,13 +26,116 @@ export default class Maze {
 
         this.rows = rows;
         this.columns = columns;
+        this.board = this.initBoard();
+        this.generateMaze();
+    }
 
-        if (initializeBoard === false) {
-            this.board = null;
-        } else {
-            this.board = this.initBoard();
-            this.generateMaze();
+    /**
+     * Returns true if the cell at (row, column) is open; false otherwise.
+     *
+     * @param {number} row the row of the cell
+     * @param {number} column the column of the cell
+     */
+    isOpen(row: number, column: number): boolean {
+        return this.board[row][column].isOpen();
+    }
+
+    /**
+     * Returns all valid neighbours of the given cell in this.board. The neighbours of
+     * a cell are the cells exactly 1 unit above, below, to the left, and to the right
+     * of the cell.
+     *
+     * @param {Cell} cell the cell whose neighbours we want
+     */
+    neighbours(cell: Cell): Cell[] {
+        let result: Cell[] = [];
+        const row: number = cell.getRow();
+        const column: number = cell.getColumn();
+
+        for (let i = -1; i <= 1; i += 2) {
+            if (0 <= row + i && row + i <= this.rows - 1) {
+                result.push(this.board[row + i][column]);
+            }
+
+            if (0 <= column + i && column + i <= this.columns - 1) {
+                result.push(this.board[row][column + i]);
+            }
         }
+
+        return result;
+    }
+
+    /**
+     * Returns true if the two cells are neighbours in this maze; false otherwise.
+     *
+     * Two cells are neighbours iff. they are both contained in this maze (determined
+     * using the contains function), and the Manhattan distance of the two cells
+     * equals 1.
+     *
+     * @param {Cell} cellOne the first cell
+     * @param {Cell} cellTwo the second cell
+     */
+    areNeighbours(cellOne: Cell, cellTwo: Cell): boolean {
+        if (this.contains(cellOne) && this.contains(cellTwo)) {
+            const dx = cellOne.getColumn() - cellTwo.getColumn();
+            const dy = cellOne.getRow() - cellTwo.getRow();
+
+            return Math.abs(dx) + Math.abs(dy) === 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true iff. the given cell object is contained in this maze.
+     * It is sufficient for the given cell to be equal to a cell in this maze
+     * (using the equals method in the Cell class).
+     * 
+     * @param cell the cell to check
+     */
+    contains(cell: Cell): boolean {
+        const row = cell.getRow();
+        const col = cell.getColumn();
+
+        if (0 <= row && row < this.rows) {
+            if (0 <= col && col < this.columns) {
+                return this.board[row][col].equals(cell);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the number of rows in this maze.
+     */
+    getRows(): number {
+        return this.rows;
+    }
+
+    /**
+     * Returns the number of columns in this maze.
+     */
+    getColumns(): number {
+        return this.columns;
+    }
+
+    /**
+     * Returns the cell at the given row and column in this maze, assuming
+     * that the row and column are in the bounds of the maze board. If that
+     * assumption is not true, returns null.
+     *
+     * @param {number} row the row of the cell to get
+     * @param {number} column the column of the cell to get
+     */
+    getCell(row: number, column: number): Cell {
+        if (0 <= row && row < this.rows) {
+            if (0 <= column && column < this.columns) {
+                return this.board[row][column];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -170,113 +265,5 @@ export default class Maze {
                 visited[wall.getRow()][wall.getColumn()] = true;
             }
         }
-    }
-
-    /**
-     * Returns true if the cell at (row, column) is open; false otherwise.
-     *
-     * @param {number} row the row of the cell
-     * @param {number} column the column of the cell
-     */
-    isOpen(row: number, column: number): boolean {
-        return this.board[row][column].isOpen();
-    }
-
-    /**
-     * Returns all valid neighbours of the given cell in this.board. The neighbours of
-     * a cell are the cells exactly 1 unit above, below, to the left, and to the right
-     * of the cell.
-     *
-     * @param {Cell} cell the cell whose neighbours we want
-     */
-    neighbours(cell: Cell): Cell[] {
-        let result: Cell[] = [];
-        const row: number = cell.getRow();
-        const column: number = cell.getColumn();
-
-        for (let i = -1; i <= 1; i += 2) {
-            if (0 <= row + i && row + i <= this.rows - 1) {
-                result.push(this.board[row + i][column]);
-            }
-
-            if (0 <= column + i && column + i <= this.columns - 1) {
-                result.push(this.board[row][column + i]);
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns true if the two cells are neighbours in this maze; false otherwise.
-     *
-     * Two cells are neighbours iff. they are both contained in this maze (determined
-     * using the contains function), and the Manhattan distance of the two cells
-     * equals 1.
-     *
-     * @param {Cell} cellOne the first cell
-     * @param {Cell} cellTwo the second cell
-     */
-    areNeighbours(cellOne: Cell, cellTwo: Cell): boolean {
-        if (this.contains(cellOne) && this.contains(cellTwo)) {
-            const dx = cellOne.getColumn() - cellTwo.getColumn();
-            const dy = cellOne.getRow() - cellTwo.getRow();
-
-            return Math.abs(dx) + Math.abs(dy) === 1;
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true iff. the given cell object is contained in this maze.
-     * It is sufficient for the given cell to be equal to a cell in this maze
-     * (using the equals method in the Cell class).
-     * 
-     * @param cell the cell to check
-     */
-    contains(cell: Cell): boolean {
-        const row = cell.getRow();
-        const col = cell.getColumn();
-
-        if (0 <= row && row < this.rows) {
-            if (0 <= col && col < this.columns) {
-                return this.board[row][col].equals(cell);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the number of rows in this maze.
-     */
-    getRows(): number {
-        return this.rows;
-    }
-
-    /**
-     * Returns the number of columns in this maze.
-     */
-    getColumns(): number {
-        return this.columns;
-    }
-
-    /**
-     * Returns the cell at the given row and column in this maze, assuming
-     * that the row and column are in the bounds of the maze board. If that
-     * assumption is not true, returns null.
-     *
-     * @param {number} row the row of the cell to get
-     * @param {number} column the column of the cell to get
-     */
-    getCell(row: number, column: number): Cell {
-        if (0 <= row && row < this.rows) {
-            if (0 <= column && column < this.columns) {
-                return this.board[row][column];
-            }
-        }
-
-        return null;
     }
 }
