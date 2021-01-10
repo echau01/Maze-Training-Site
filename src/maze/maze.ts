@@ -44,38 +44,6 @@ export default class Maze {
     }
 
     /**
-     * Returns a new Maze object with the given board as the maze board.
-     * The board must be a 2D grid of Cells. The outer array must have a 
-     * nonzero length, and every inner array must have the same length
-     * (which must also be nonzero). If these conditions are not satisfied,
-     * an Error is thrown.
-     * 
-     * @param board the maze board
-     */
-    static toMaze(board: Cell[][]): Maze {
-        const rows = board.length;
-
-        if (rows !== 0) {
-            const columns = board[0].length;
-
-            if (columns !== 0) {
-                for (let i = 1; i < rows; i++) {
-                    if (board[i].length !== columns) {
-                        throw new Error("Not all inner arrays of the given board have the same length.");
-                    }
-                }
-
-                let maze: Maze = new Maze(rows, columns, false);
-                maze.board = board;
-
-                return maze;
-            }
-        }
-
-        throw new Error("The given board must have a nonzero number of rows and columns.");
-    }
-
-    /**
      * Initializes and returns the maze board. Each element is initialized to an open cell, except:
      * - all cells in odd-indexed rows are closed, excluding the last row
      * - all cells in odd-indexed columns are closed, excluding the last column

@@ -101,15 +101,20 @@ document.getElementById("generateMazeBtn").addEventListener("click", function(ev
     fetch("/generateMaze")
         .then(res => res.json())
         .then(data => {
-            let board = data["board"];
+            // data has all the properties of a Maze object without the Maze prototype.
+            // We set data to have the Maze prototype, then we set each element in the
+            // maze board to have the Cell prototype.
+
+            Object.setPrototypeOf(data, Maze.prototype);
+            let board = data.board;
 
             for (let i = 0; i < board.length; i++) {
                 for (let j = 0; j < board[i].length; j++) {
-                    board[i][j] = Cell.toCell(board[i][j]);
+                    Object.setPrototypeOf(board[i][j], Cell.prototype);
                 }
             }
 
-            gameInstance = new MazeGame(1000, 500, Maze.toMaze(board));
+            gameInstance = new MazeGame(1000, 500, data);
         })
         .catch(err => console.log(err));
 });

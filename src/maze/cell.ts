@@ -77,22 +77,4 @@ export default class Cell {
             && this.column === otherCell.column 
             && this.open === otherCell.open;
     }
-
-    /**
-     * Returns a Cell with the same row, column, and open status as
-     * the given object. If the object cannot be parsed into a Cell, 
-     * then an Error is thrown.
-     *  
-     * @param obj the object to convert to a Cell.
-     */
-    static toCell(obj: Object): Cell {
-        if (obj && obj.hasOwnProperty("row") && obj.hasOwnProperty("column")
-            && obj.hasOwnProperty("open") && typeof(obj["row"]) == "number"
-            && typeof(obj["column"]) == "number" && typeof(obj["open"]) == "boolean")
-        {
-            return new Cell(obj["row"], obj["column"], obj["open"]);
-        }
-
-        throw new Error("obj cannot be parsed into a Cell.");
-    }
 }
