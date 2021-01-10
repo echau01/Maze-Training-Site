@@ -1,10 +1,3 @@
-interface ICell {
-    row: number;
-    column: number;
-    open: boolean;
-}
-
-
 /**
  * Represents a cell in a maze.
  */
