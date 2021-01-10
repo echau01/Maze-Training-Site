@@ -13,11 +13,19 @@ export default class Maze {
     /**
      * Constructs a 2D maze with the given dimensions. The total size of the maze (equal
      * to the product of rows and columns) must be at least 1 and at most 2^31 - 1.
+     * 
+     * If initializeBoard is true, then the maze board will be initialized with a
+     * randomly-generated grid of cells. If initalizeBoard is false, then the maze board 
+     * is set to null. If the parameter is omitted, we fully initialize the maze board 
+     * (as though initializeBoard were true). Generally, this parameter should be omitted;
+     * it should only be set to false for internal use inside the Maze class (where the maze 
+     * board can be separately assigned).
      *
      * @param {number} rows the number of rows in the maze
      * @param {number} columns the number of columns in the maze
+     * @param {boolean} [initializeBoard] whether to initialize the maze board or not
      */
-    constructor(rows: number, columns: number) {
+    constructor(rows: number, columns: number, initializeBoard?: boolean) {
         if (rows * columns === 0) {
             throw new Error("One of rows and columns is 0.");
         } else if (rows > Math.floor(2147483647 / columns)) {
@@ -26,8 +34,45 @@ export default class Maze {
 
         this.rows = rows;
         this.columns = columns;
-        this.board = this.initBoard();
-        this.generateMaze();
+
+        if (initializeBoard === false) {
+            this.board = null;
+        } else {
+            this.board = this.initBoard();
+            this.generateMaze();
+        }
+    }
+
+    /**
+     * Returns a new Maze object with the given board as the maze board.
+     * The board must be a 2D grid of Cells. The outer array must have a 
+     * nonzero length, and every inner array must have the same length
+     * (which must also be nonzero). If these conditions are not satisfied,
+     * an Error is thrown.
+     * 
+     * @param board the maze board
+     */
+    static toMaze(board: Cell[][]): Maze {
+        const rows = board.length;
+
+        if (rows !== 0) {
+            const columns = board[0].length;
+
+            if (columns !== 0) {
+                for (let i = 1; i < rows; i++) {
+                    if (board[i].length !== columns) {
+                        throw new Error("Not all inner arrays of the given board have the same length.");
+                    }
+                }
+
+                let maze: Maze = new Maze(rows, columns, false);
+                maze.board = board;
+
+                return maze;
+            }
+        }
+
+        throw new Error("The given board must have a nonzero number of rows and columns.");
     }
 
     /**
@@ -44,14 +89,14 @@ export default class Maze {
             if (i % 2 === 0 || i === this.rows - 1) {
                 for (let j = 0; j < this.columns; j++) {
                     if (j % 2 === 0 || j === this.columns - 1) {
-                        row.push(new Cell(i, j, true, this));
+                        row.push(new Cell(i, j, true));
                     } else {
-                        row.push(new Cell(i, j, false, this));
+                        row.push(new Cell(i, j, false));
                     }
                 }
             } else {
                 for (let j = 0; j < this.columns; j++) {
-                    row.push(new Cell(i, j, false, this));
+                    row.push(new Cell(i, j, false));
                 }
             }
 
@@ -192,6 +237,47 @@ export default class Maze {
         }
 
         return result;
+    }
+
+    /**
+     * Returns true if the two cells are neighbours in this maze; false otherwise.
+     *
+     * Two cells are neighbours iff. they are both contained in this maze (determined
+     * using the contains function), and the Manhattan distance of the two cells
+     * equals 1.
+     *
+     * @param {Cell} cellOne the first cell
+     * @param {Cell} cellTwo the second cell
+     */
+    areNeighbours(cellOne: Cell, cellTwo: Cell): boolean {
+        if (this.contains(cellOne) && this.contains(cellTwo)) {
+            const dx = cellOne.getColumn() - cellTwo.getColumn();
+            const dy = cellOne.getRow() - cellTwo.getRow();
+
+            return Math.abs(dx) + Math.abs(dy) === 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true iff. the given cell object is contained in this maze.
+     * It is sufficient for the given cell to be equal to a cell in this maze
+     * (using the equals method in the Cell class).
+     * 
+     * @param cell the cell to check
+     */
+    contains(cell: Cell): boolean {
+        const row = cell.getRow();
+        const col = cell.getColumn();
+
+        if (0 <= row && row < this.rows) {
+            if (0 <= col && col < this.columns) {
+                return this.board[row][col].equals(cell);
+            }
+        }
+
+        return false;
     }
 
     /**

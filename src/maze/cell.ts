@@ -1,4 +1,8 @@
-import Maze from "./maze";
+interface ICell {
+    row: number;
+    column: number;
+    open: boolean;
+}
 
 
 /**
@@ -8,10 +12,9 @@ export default class Cell {
     private readonly row: number;
     private readonly column: number;
     private open: boolean;
-    private maze: Maze;
 
     /**
-     * Constructs a cell at the given row and column of the specified maze.
+     * Constructs a cell at the given row and column.
      *
      * Every cell is either open or closed. An open cell is a cell that can be in a maze path,
      * and a closed cell is a wall.
@@ -19,10 +22,8 @@ export default class Cell {
      * @param {number} row the row of the cell. Must be a nonnegative integer.
      * @param {number} column the column of the cell. Must be a nonnegative integer.
      * @param {boolean} open whether the cell is open or not
-     * @param {Maze} maze the maze this cell is in. The caller must update the maze's board to include
-     * this new cell.
      */
-    constructor(row: number, column: number, open: boolean, maze: Maze) {
+    constructor(row: number, column: number, open: boolean) {
         if (row < 0) {
             throw new Error("row parameter is negative");
         }
@@ -33,7 +34,6 @@ export default class Cell {
         this.row = row;
         this.column = column;
         this.open = open;
-        this.maze = maze;
     }
 
     /**
@@ -53,35 +53,6 @@ export default class Cell {
     }
 
     /**
-     * Returns true if this cell is a neighbour of otherCell in the maze; false otherwise.
-     *
-     * Two cells are neighbours iff. they are in the same maze, and the sum of their horizontal
-     * distance (in terms of number of columns) and their vertical distance (in terms of number of rows)
-     * equals 1.
-     *
-     * @param {Cell} otherCell the cell whose neighbourship with this cell we want to check
-     */
-    isNeighbour(otherCell: Cell): boolean {
-        if (otherCell.maze === this.maze) {
-            const dx = otherCell.getColumn() - this.column;
-            const dy = otherCell.getRow() - this.row;
-
-            return Math.abs(dx) + Math.abs(dy) === 1;
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns all valid neighbours of this cell in the maze it is in. The neighbours of
-     * a cell are the cells exactly 1 unit above, below, to the left, and to the right
-     * of the cell.
-     */
-    getNeighbours(): Cell[] {
-        return this.maze.neighbours(this);
-    }
-
-    /**
      * Returns the row of this cell in the maze.
      */
     getRow(): number {
@@ -96,9 +67,32 @@ export default class Cell {
     }
 
     /**
-     * Returns the maze object that this cell is in.
+     * Returns true if this cell has the same row, column, and open status
+     * as the specified cell.
+     * 
+     * @param otherCell the cell to compare to this cell for equality
      */
-    getMaze(): Maze {
-        return this.maze;
+    equals(otherCell: Cell): boolean {
+        return this.row === otherCell.row 
+            && this.column === otherCell.column 
+            && this.open === otherCell.open;
+    }
+
+    /**
+     * Returns a Cell with the same row, column, and open status as
+     * the given object. If the object cannot be parsed into a Cell, 
+     * then an Error is thrown.
+     *  
+     * @param obj the object to convert to a Cell.
+     */
+    static toCell(obj: Object): Cell {
+        if (obj && obj.hasOwnProperty("row") && obj.hasOwnProperty("column")
+            && obj.hasOwnProperty("open") && typeof(obj["row"]) == "number"
+            && typeof(obj["column"]) == "number" && typeof(obj["open"]) == "boolean")
+        {
+            return new Cell(obj["row"], obj["column"], obj["open"]);
+        }
+
+        throw new Error("obj cannot be parsed into a Cell.");
     }
 }

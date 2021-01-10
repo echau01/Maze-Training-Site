@@ -42,13 +42,13 @@ export default class MazePath {
      * @param {Cell} cell the cell to add to this maze path
      */
     add(cell: Cell): void {
-        if (cell && cell.getMaze() === this.mazeDrawer.getMaze() && cell.isOpen()) {
+        if (cell && cell.isOpen() && this.mazeDrawer.getMaze().contains(cell)) {
             if (this.path.length === 0) {
                 this.cellPositions[cell.getRow()][cell.getColumn()] = 0;
                 this.path.push(cell);
                 this.mazeDrawer.drawEllipse(cell.getRow(), cell.getColumn());
             } else if (this.cellPositions[cell.getRow()][cell.getColumn()] === -1) {
-                const cellNeighbours: Cell[] = cell.getNeighbours();
+                const cellNeighbours: Cell[] = this.mazeDrawer.getMaze().neighbours(cell);
                 const lastCell: Cell = this.path[this.path.length - 1];
 
                 for (let i = 0; i < cellNeighbours.length; i++) {
@@ -77,7 +77,7 @@ export default class MazePath {
      * @param {Cell} cell the cell to remove from this maze path
      */
     remove(cell: Cell): void {
-        if (cell && cell.getMaze() === this.mazeDrawer.getMaze()) {
+        if (cell && this.mazeDrawer.getMaze().contains(cell)) {
             const position: number = this.cellPositions[cell.getRow()][cell.getColumn()];
 
             if (position !== -1) {
@@ -106,7 +106,7 @@ export default class MazePath {
      * @param {Cell} cell the cell whose position we want
      */
     getPosition(cell: Cell): number {
-        if (cell.getMaze() === this.mazeDrawer.getMaze()) {
+        if (this.mazeDrawer.getMaze().contains(cell)) {
             return this.cellPositions[cell.getRow()][cell.getColumn()];
         }
 
@@ -148,16 +148,17 @@ export default class MazePath {
      * bottom-right corner of the maze; false otherwise.
      */
     isComplete(): boolean {
+        const maze: Maze = this.mazeDrawer.getMaze();
+
         for (let i = 0; i < this.path.length - 1; i++) {
             const cell: Cell = this.path[i];
 
-            if (!cell.isOpen() || !cell.isNeighbour(this.path[i + 1])) {
+            if (!cell.isOpen() || !maze.areNeighbours(cell, this.path[i + 1])) {
                 return false;
             }
         }
 
         const lastCell: Cell = this.path[this.path.length - 1];
-        const maze: Maze = this.mazeDrawer.getMaze();
 
         return lastCell.isOpen() && lastCell === maze.getCell(maze.getRows() - 1, maze.getColumns() - 1);
     }

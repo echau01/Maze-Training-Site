@@ -17,13 +17,15 @@ class MazeGame {
     private startTime: Date;
 
     /**
-     * Creates and renders a randomly-generated maze on an HTML canvas with the 
-     * specified width and height.
+     * Creates and renders the given maze on an HTML canvas with the specified width and 
+     * height. The user can then solve the maze by dragging their mouse from start to
+     * finish.
      * 
      * @param {number} canvasWidth the width of the canvas that the maze is rendered on
      * @param {number} canvasHeight the height of the canvas that the maze is rendered on
+     * @param {Maze} maze the maze that the user must solve
      */
-    constructor(canvasWidth: number, canvasHeight: number) {
+    constructor(canvasWidth: number, canvasHeight: number, maze: Maze) {
         const element: HTMLElement = document.getElementById("mazeArea");
         element.innerHTML = "<canvas id=\"maze\" style=\"border:1px solid #000000\"></canvas>";
 
@@ -31,8 +33,7 @@ class MazeGame {
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
 
-        // Note: mazes look the best when the number of rows and columns are both odd.
-        this.maze = new Maze(25, 51);
+        this.maze = maze;
         this.mazeDrawer = new MazeDrawer(this.maze, canvas);
         this.mazeDrawer.drawMaze();
         this.mazePath = new MazePath(this.mazeDrawer);
@@ -64,7 +65,7 @@ class MazeGame {
                 if (this.mazePath.isInPath(cellToAdd)) {
                     this.mazePath.remove(this.mazePath.getCell(this.mazePath.getPosition(cellToAdd) + 1));
                 } else {
-                    const cellNeighbours: Cell[] = cellToAdd.getNeighbours();
+                    const cellNeighbours: Cell[] = this.maze.neighbours(cellToAdd);
 
                     for (let i = 0; i < cellNeighbours.length; i++) {
                         const position: number = this.mazePath.getPosition(cellNeighbours[i]);
@@ -97,7 +98,20 @@ class MazeGame {
 }
 
 document.getElementById("generateMazeBtn").addEventListener("click", function(event: MouseEvent) {
-    gameInstance = new MazeGame(1000, 500);
+    fetch("/generateMaze")
+        .then(res => res.json())
+        .then(data => {
+            let board = data["board"];
+
+            for (let i = 0; i < board.length; i++) {
+                for (let j = 0; j < board[i].length; j++) {
+                    board[i][j] = Cell.toCell(board[i][j]);
+                }
+            }
+
+            gameInstance = new MazeGame(1000, 500, Maze.toMaze(board));
+        })
+        .catch(err => console.log(err));
 });
 
 document.addEventListener("mousedown", function(event: MouseEvent) {
