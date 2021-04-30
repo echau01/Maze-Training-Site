@@ -114,7 +114,7 @@ document.getElementById("generateMazeBtn").addEventListener("click", function(ev
                 }
             }
 
-            gameInstance = new MazeGame(1000, 500, data);
+            gameInstance = new MazeGame(screen.width * 0.99, screen.height * 0.89, data);
         })
         .catch(err => console.log(err));
 });
