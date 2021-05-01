@@ -31,7 +31,6 @@ class MazeGame {
         const element: HTMLElement = document.getElementById("mazeArea");
         element.innerHTML = "<canvas id=\"maze\" style=\"border:1px solid #000000\"></canvas>";
 
-        //const canvas: HTMLCanvasElement = document.getElementById("maze") as HTMLCanvasElement;
         this.canvas = document.getElementById("maze") as HTMLCanvasElement;
         this.canvas.width = canvasWidth;
         this.canvas.height = canvasHeight;
@@ -56,7 +55,8 @@ class MazeGame {
             const timeDelta: number = finishTime.getTime() - this.startTime.getTime();
 
             this.isMazeSolved = true;
-            this.mazePath = getSolution(this.maze, new MazePath(new MazeDrawer(this.maze, this.canvas)));
+            //let mazeSolution: MazePath =
+            getSolution(this.maze, new MazePath(new MazeDrawer(this.maze, this.canvas)));
 
             alert("You have given up solving the maze after " + (timeDelta / 1000) + " seconds.\n\n" +
                 "The solution to the maze will be shown upon closing this prompt.\n\n" +
