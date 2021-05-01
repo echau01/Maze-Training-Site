@@ -2,6 +2,7 @@ import Cell from "../maze/cell"
 import Maze from "../maze/maze";
 import MazeDrawer from "../maze/mazedrawer";
 import MazePath from "../maze/mazepath";
+import {getSolution} from "../maze/mazeoperations";
 
 var isUserMouseDown: boolean = false;
 var gameInstance: MazeGame;
@@ -15,6 +16,7 @@ class MazeGame {
     private mazeDrawer: MazeDrawer;
     private isMazeSolved: boolean;
     private startTime: Date;
+    private canvas: HTMLCanvasElement;
 
     /**
      * Creates and renders the given maze on an HTML canvas with the specified width and 
@@ -29,22 +31,37 @@ class MazeGame {
         const element: HTMLElement = document.getElementById("mazeArea");
         element.innerHTML = "<canvas id=\"maze\" style=\"border:1px solid #000000\"></canvas>";
 
-        const canvas: HTMLCanvasElement = document.getElementById("maze") as HTMLCanvasElement;
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
+        //const canvas: HTMLCanvasElement = document.getElementById("maze") as HTMLCanvasElement;
+        this.canvas = document.getElementById("maze") as HTMLCanvasElement;
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
 
         this.maze = maze;
-        this.mazeDrawer = new MazeDrawer(this.maze, canvas);
+        this.mazeDrawer = new MazeDrawer(this.maze, this.canvas);
         this.mazeDrawer.drawMaze();
         this.mazePath = new MazePath(this.mazeDrawer);
         this.mazePath.add(this.maze.getCell(0, 0));
 
-        canvas.addEventListener("mousemove", (event: MouseEvent) => {
-            this.handleMouseDrag(canvas, event);
+        this.canvas.addEventListener("mousemove", (event: MouseEvent) => {
+            this.handleMouseDrag(this.canvas, event);
         });
 
         this.isMazeSolved = false;
         this.startTime = new Date();
+    }
+
+    solveMaze() {
+        if (!this.isMazeSolved) {
+            const finishTime: Date = new Date();
+            const timeDelta: number = finishTime.getTime() - this.startTime.getTime();
+
+            this.isMazeSolved = true;
+            this.mazePath = getSolution(this.maze, new MazePath(new MazeDrawer(this.maze, this.canvas)));
+
+            alert("You have given up solving the maze after " + (timeDelta / 1000) + " seconds.\n\n" +
+                "The solution to the maze will be shown upon closing this prompt.\n\n" +
+                "If you want to try another maze, press the \"Generate a maze\" button.");
+        }
     }
 
     private handleMouseDrag(canvas: HTMLCanvasElement, event: MouseEvent): void {
@@ -87,7 +104,7 @@ class MazeGame {
                         const finishTime: Date = new Date();
                         const timeDelta: number = finishTime.getTime() - this.startTime.getTime();
 
-                        alert("Congratulations! You solved the maze in " + (timeDelta / 1000) + " seconds!\n\n" + 
+                        alert("Congratulations! You solved the maze in " + (timeDelta / 1000) + " seconds!\n\n" +
                             "If you want to try another maze, press the \"Generate a maze\" button.");
                         this.isMazeSolved = true;
                     }
@@ -97,7 +114,7 @@ class MazeGame {
     }
 }
 
-document.getElementById("generateMazeBtn").addEventListener("click", function(event: MouseEvent) {
+document.getElementById("generateMazeBtn").addEventListener("click", function() {
     fetch("/generateMaze")
         .then(res => res.json())
         .then(data => {
@@ -118,6 +135,12 @@ document.getElementById("generateMazeBtn").addEventListener("click", function(ev
         })
         .catch(err => console.log(err));
 });
+
+document.getElementById("giveUpBtn").addEventListener("click", function() {
+    if (gameInstance) {
+        gameInstance.solveMaze();
+    }
+})
 
 document.addEventListener("mousedown", function(event: MouseEvent) {
     if (event.button === 0) {
