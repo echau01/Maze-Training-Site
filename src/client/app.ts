@@ -2,7 +2,7 @@ import Cell from "../maze/cell"
 import Maze from "../maze/maze";
 import MazeDrawer from "../maze/mazedrawer";
 import MazePath from "../maze/mazepath";
-import {getSolution} from "../maze/mazeoperations";
+import {drawSolution} from "../maze/mazeoperations";
 
 var isUserMouseDown: boolean = false;
 var gameInstance: MazeGame;
@@ -55,8 +55,7 @@ class MazeGame {
             const timeDelta: number = finishTime.getTime() - this.startTime.getTime();
 
             this.isMazeSolved = true;
-            //let mazeSolution: MazePath =
-            getSolution(this.maze, new MazePath(new MazeDrawer(this.maze, this.canvas)));
+            drawSolution(this.maze, this.canvas);
 
             alert("You have given up solving the maze after " + (timeDelta / 1000) + " seconds.\n\n" +
                 "The solution to the maze will be shown upon closing this prompt.\n\n" +
