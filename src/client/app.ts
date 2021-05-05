@@ -99,7 +99,9 @@ class MazeGame {
 
 document.getElementById("generateMazeBtn").addEventListener("click", function(event: MouseEvent) {
     fetch("/generateMaze")
-        .then(res => res.json())
+        .then(res => {
+            return res.json();
+        })
         .then(data => {
             // data has all the properties of a Maze object without the Maze prototype.
             // We set data to have the Maze prototype, then we set each element in the
@@ -114,7 +116,7 @@ document.getElementById("generateMazeBtn").addEventListener("click", function(ev
                 }
             }
 
-            gameInstance = new MazeGame(screen.width * 0.99, screen.height * 0.89, data);
+            gameInstance = new MazeGame(document.documentElement.clientWidth * 0.9, document.documentElement.clientHeight * 0.9, data);
         })
         .catch(err => console.log(err));
 });
