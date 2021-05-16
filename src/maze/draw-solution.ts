@@ -1,7 +1,7 @@
-import MazePath from "./mazepath";
-import Maze from "./maze";
 import Cell from "./cell";
-import MazeDrawer from "./mazeDrawer";
+import Maze from "./maze";
+import MazeDrawer from "./maze-drawer";
+import MazePath from "./maze-path";
 import Queue from "./util/queue";
 
 

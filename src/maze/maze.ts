@@ -1,5 +1,5 @@
 import Cell from "./cell";
-import { PriorityQueue } from "./util/priorityQueue";
+import { PriorityQueue } from "./util/priority-queue";
 
 
 /**

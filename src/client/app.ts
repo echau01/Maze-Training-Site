@@ -1,8 +1,8 @@
 import Cell from "../maze/cell"
-import Maze from "../maze/maze";
-import MazeDrawer from "../maze/mazeDrawer";
-import MazePath from "../maze/mazepath";
 import drawSolution from "../maze/drawSolution";
+import Maze from "../maze/maze";
+import MazeDrawer from "../maze/maze-drawer";
+import MazePath from "../maze/mazePath";
 
 var isUserMouseDown: boolean = false;
 var gameInstance: MazeGame;

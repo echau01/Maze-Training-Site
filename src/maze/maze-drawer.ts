@@ -1,7 +1,7 @@
 import Cell from "./cell";
 import Direction from "./direction"
 import Maze from "./maze";
-import MazePath from "./mazepath";
+import MazePath from "./mazePath";
 
 
 /**
