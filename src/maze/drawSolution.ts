@@ -1,8 +1,8 @@
 import MazePath from "./mazepath";
 import Maze from "./maze";
 import Cell from "./cell";
-import MazeDrawer from "./mazedrawer";
-import {Queue} from "./queue";
+import MazeDrawer from "./mazeDrawer";
+import Queue from "./util/queue";
 
 
 /**
@@ -11,7 +11,7 @@ import {Queue} from "./queue";
  * @param maze the maze to draw the solution for
  * @param canvas the HTML canvas to draw the solution on
  */
-export function drawSolution(maze: Maze, canvas: HTMLCanvasElement) {
+export default function drawSolution(maze: Maze, canvas: HTMLCanvasElement) {
     let visited: boolean[][] = [];            // Keeps track of previously visited paths.
     let toExplore: Queue<Cell> = new Queue(); // Location data will be stored as an array holding an x and y value.
     let discoveredFrom: Cell[][] = [];        // Marks which cell the current cell had come from.

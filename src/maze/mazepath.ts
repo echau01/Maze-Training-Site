@@ -1,6 +1,6 @@
 import Cell from "./cell";
 import Maze from "./maze";
-import MazeDrawer from "./mazedrawer";
+import MazeDrawer from "./mazeDrawer";
 
 
 /**

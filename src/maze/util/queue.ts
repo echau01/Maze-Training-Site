@@ -1,7 +1,7 @@
 /** 
  * Dynamic array-based queue implementation.
  */
-export class Queue<T> {
+export default class Queue<T> {
     private _arr: T[];
     private entry: number;
     private exit: number;

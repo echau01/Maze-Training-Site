@@ -45,7 +45,7 @@ export class PriorityQueueElement<T> {
 }
 
 /**
- * A priority queue implemented as a 0-based binary minheap.
+ * A priority queue implemented as a 0-indexed binary minheap.
  */
 export class PriorityQueue<T> {
     private heap: PriorityQueueElement<T>[]
