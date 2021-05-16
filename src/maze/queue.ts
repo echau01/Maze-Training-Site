@@ -1,24 +1,34 @@
-// Dynamic array-based queue implementation.
+/** 
+ * Dynamic array-based queue implementation.
+ */
 export class Queue<T> {
     private _arr: T[];
     private entry: number;
     private exit: number;
 
-    // Constructor for an array-based implementation of a queue.
+    /**
+     * Creates an empty queue.
+     */
     constructor() {
         this._arr = [];
         this.entry = 0;
         this.exit = 0;
     }
 
-    // Pushes an item into the queue.
+    /**
+     * Pushes an item onto the back of the queue.
+     * 
+     * @param val the item to push
+     */
     push(val: T) {
         this._arr[this.entry] = val;
         this.entry++;
     }
 
-    // Pops the queue and returns the value.
-    pop() {
+    /**
+     * Pops and returns the frontmost element of the queue.
+     */
+    pop(): T {
         if (this.size() == 0) {
             throw new Error("cannot call pop on an empty queue");
         }
@@ -35,8 +45,10 @@ export class Queue<T> {
         return ret;
     }
 
-    // Returns the size of the queue.
-    size() {
+    /**
+     * Returns the number of elements in the queue.
+     */
+    size(): number {
         return this.entry - this.exit;
     }
 }

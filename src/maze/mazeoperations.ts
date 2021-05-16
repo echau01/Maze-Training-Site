@@ -5,7 +5,12 @@ import MazeDrawer from "./mazedrawer";
 import {Queue} from "./queue";
 
 
-// Draws the solution of the given maze onto the given canvas.
+/**
+ * Draws the solution of the given maze onto the given canvas.
+ * 
+ * @param maze the maze to draw the solution for
+ * @param canvas the HTML canvas to draw the solution on
+ */
 export function drawSolution(maze: Maze, canvas: HTMLCanvasElement) {
     let visited: boolean[][] = [];            // Keeps track of previously visited paths.
     let toExplore: Queue<Cell> = new Queue(); // Location data will be stored as an array holding an x and y value.
